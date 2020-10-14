@@ -1,4 +1,4 @@
-## [中文文档](https://github.com/xkerwin/Weather-Cal/blob/main/README_cn.md)
+### [中文文档](https://github.com/xkerwin/Weather-Cal/blob/main/README_cn.md)
 
 # Weather Cal
 This is a Scriptable widget that allows you to display, position, and format multiple elements, including the date, a greeting, your upcoming events, the current weather, and future weather. You can even create your own elements by writing a function that has a single WidgetStack as an argument (representing a column).
