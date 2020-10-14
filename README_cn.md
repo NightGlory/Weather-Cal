@@ -50,3 +50,5 @@ events,
 * 用于存储项目所需的结构化数据的变量。名称应为一个单词，后接`Data`。例如：`weatherData`。与其他数据变量（`eventData`，`locationData`等）一起声明。确保没有重复于现有的数据变量包含项所需的信息。
 * __遵从条件:__ If a widget item uses a data variable, a setup function is required. The name should be “setup” followed by one word. For example: `setupWeather`. If you’re using a setup function, the item function should check to see if the data is null, and run the setup function if it is. For example: `if (!weatherData) { await setupWeather() }`. This allows other widget items to use the provided data if needed. For example, the `current` and `future` weather items both use `weatherData`, so they both check this variable and run the setup if needed.
 * 如果小部件项目使用数据变量，则需要设置功能。名称应为` setup`，后接一个单词。例如：`setupWeather`。如果您使用的是设置功能，则项目函数应检查数据是否为空，如果是，则运行设置功能。例如：`if (!weatherData) { await setupWeather() }`。如果需要，这是允许其他窗口小部件项目使用提供的数据。例如，`current`和`future`天气项目都使用` weatherData`，因此它们都检查此变量并在需要时运行该设置。
+
+## FAQ
