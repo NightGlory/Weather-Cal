@@ -1,4 +1,4 @@
-#### If you want to use a transparent background, please use this script [Transparent Widgets Export.js](https://github.com/xkerwin/Weather-Cal/blob/main/Transparent%20Widgets%20Export.js)
+## [中文文档](https://github.com/xkerwin/Weather-Cal/blob/main/README_cn.md)
 
 # Weather Cal
 This is a Scriptable widget that allows you to display, position, and format multiple elements, including the date, a greeting, your upcoming events, the current weather, and future weather. You can even create your own elements by writing a function that has a single WidgetStack as an argument (representing a column).
