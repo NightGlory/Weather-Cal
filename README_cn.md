@@ -8,7 +8,7 @@
 
 1. 到[free OpenWeather API key](http://openweathermap.org/api)注册一个账号，获得API key，然后粘贴到 `apiKey = ""`的引号内，请注意，这个API可能需要一段时间才生效！
 2. 基础设置：编辑`weather-cal.js`的【小部件设置】部分来进行一些基础设置（注意看注释）
-3. 运行脚本。它会提示您输入您的位置和背景图片（如果启用）。最后，它会在Scriptable中显示预览。
+3. 运行脚本。它会提示您获取定位信息和选择背景图片（如果启用）。最后，它会在Scriptable中显示预览。
 4. 在桌面上添加Scriptable的Widget，长按选择`weather-cal`即可。
 
 如果你需要在这个小部件脚本上使用透明背景，请先使用这个 [Transparent Widgets.js](https://github.com/xkerwin/Weather-Cal/blob/main/Transparent%20Widgets%20Export.js)来制作，在最后，选择导出到相册，然后再次运行`weather-cal`选择刚刚制作好的背景图即可
