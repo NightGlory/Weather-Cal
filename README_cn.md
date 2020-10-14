@@ -13,7 +13,7 @@
 
 如果你需要在这个小部件脚本上使用透明背景，请先使用这个 [Transparent Widgets.js](https://github.com/xkerwin/Weather-Cal/blob/main/Transparent%20Widgets%20Export.js)来制作，在最后，选择导出到相册，然后再次运行`weather-cal`选择刚刚制作好的背景图即可
 
-关于其他调整与设置，参见：FAQ
+关于其他调整与设置，参见：[FAQ](https://github.com/xkerwin/Weather-Cal/blob/main/README_cn.md#faq)
 
 ## 布局调整
 
