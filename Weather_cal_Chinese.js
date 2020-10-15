@@ -7,7 +7,7 @@
 
 // To use weather, get a free API key at openweathermap.org/appid and paste it in between the quotation marks.
 // 要使用天气，请在http://openweathermap.org/appid 中获取免费的API密钥并将其粘贴在引号之间。
-const apiKey = "89065f71db2277c83d22a779a34f16a7"
+const apiKey = ""
 
 // Set the locale code. Leave blank "" to match the device's locale. You can change the hard-coded text strings in the TEXT section below.
 // 设置语言环境代码。“”内保留空白以匹配设备的语言环境。您可以在下面的“文本”部分中更改硬编码的文本字符串。
