@@ -1,3 +1,5 @@
+[![Anurag's github stats](https://github-readme-stats.vercel.app/api?username=xkerwin)](https://github.com/anuraghazra/github-readme-stats)
+
 ### [中文文档](https://github.com/xkerwin/Weather-Cal/blob/main/README_cn.md)
 
 # Weather Cal
