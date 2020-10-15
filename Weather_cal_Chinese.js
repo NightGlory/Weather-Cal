@@ -39,25 +39,26 @@ const padding = 5
  * 此设置决定要在小部件上显示的项目。
  * ========================================
  */
-
-// You always need to start with "row," and "column," items, but you can now add as many as you want.
-// Adding left, right, or center will align everything after that. The default alignment is left.
-// You can add a flexible vertical space with "space," or a fixed-size space like this: "space(50)"
-// Align items to the top or bottom of columns by adding "space," before or after all items in the column.
-// There are many possible items, including: date, greeting, events, current, future, battery, sunrise, and text("Your text here")
-
-
-// Set the width of the column, or set to 0 for an automatic width.
-// 设置列的宽度，或者将其设置为0以表示自动宽度。
-
 // You can add items to the column: 
 // 把你要显示在小部件上的项目添加到items:
+
+// You always need to start with "row," and "column," items, but you can now add as many as you want.
+// 使用行和列来布局，使你可以更加自由地增加/删减要在小部件上显示的项目
+
+// You can also add a left, center, or right to the list. Everything after it will be aligned that way.
+// 您还可以在column下添加left（居左对齐），center（居中对齐）或right（居右对齐）。之后的该列下的所有内容都将以这种方式对齐。
+
+// You can add a flexible vertical space with "space," or a fixed-size space like this: "space(50)"
+// 你可以添加一个“space”增加一个固定大小的空间，并且可以定义它的大小，比如： "space(50)"
+
+// Align items to the top or bottom of columns by adding "space," before or after all items in the column.
+// 通过在列中所有项目的前面或后面添加“space“，使项目与列的顶部或底部对齐。
 
 // date, greeting, events, current, future, battery, text("Your text here")
 // 日期，问候语，事件，当前天气，未来天气，电池，文本（“此处输入文字”）（默认只有这些项目，可自定义添加）
 
-// You can also add a left, center, or right to the list. Everything after it will be aligned that way.
-// 您还可以在列表中添加left（居左对齐），center（居中对齐）或right（居右对齐）。之后的该列下的所有内容都将以这种方式对齐。
+// To define the width of the column, please add (X) value after "column", for example: column(90), then define the width of the column as 90, if not added, the width will be automatic
+// 要定义列的宽度，请在“column”后添加（X）数值，比如：column（90），则定义该列的宽度为90，不添加则自动宽度
 
 // Make sure to always put a comma after each item.
 // 注意格式，确保在每个项目后面加上逗号！！！
