@@ -40,6 +40,13 @@ const padding = 5
  * ========================================
  */
 
+// You always need to start with "row," and "column," items, but you can now add as many as you want.
+// Adding left, right, or center will align everything after that. The default alignment is left.
+// You can add a flexible vertical space with "space," or a fixed-size space like this: "space(50)"
+// Align items to the top or bottom of columns by adding "space," before or after all items in the column.
+// There are many possible items, including: date, greeting, events, current, future, battery, sunrise, and text("Your text here")
+
+
 // Set the width of the column, or set to 0 for an automatic width.
 // 设置列的宽度，或者将其设置为0以表示自动宽度。
 
@@ -55,32 +62,31 @@ const padding = 5
 // Make sure to always put a comma after each item.
 // 注意格式，确保在每个项目后面加上逗号！！！
 
-const columns = [{
+const items = [
   
-  // Settings for the left column.
-  width: 0,
-  items: [
-    
-    left,
+  row,
+  
+    column,
     greeting,
-    //text("hello"),如果你要在这里显示自定义文本内容，请以这个格式输入
     date,
-    events,
     battery,
-    
-]}, {
 
-  // Settings for the right column.
-  width: 120,
-  items: [
-    
+    column(95),
     right,
     current,
     sunrise,
-    future,
-
+    
+  row,
   
-]}]
+    column,
+    left,
+    events,
+
+    column(95),
+    right,
+    future,
+  
+]
 
 /*
  * ITEM SETTINGS/项目设置
@@ -95,7 +101,7 @@ const dateSettings = {
 
   // If set to true, date will become smaller when events are displayed.
   // 如果设置为true，则显示事件时日期将变小。
-  dynamicDateSize: true
+  dynamicDateSize: false
 
   // If the date is not dynamic, should it be large or small?
   // 如果日期非dynamic的，它将以什么大小显示？large/small
@@ -172,7 +178,7 @@ const weatherSettings = {
 
   // Set the hour (in 24-hour time) to switch to tomorrow's weather. Set to 24 to never show it.
   // 设置多少小时（以24小时制）以监视明天的天气。设置为24永不显示它。（则该数值是你想在哪个时间开始显示明天的天气，如设置为20，则当天晚上8点才显示明天的天气，晚上8点前都将显示每个时段的下一个小时的天气）
-  ,tomorrowShownAtHour: 18
+  ,tomorrowShownAtHour: 20
 }
 
 /*
@@ -265,36 +271,26 @@ const files = FileManager.local()
  * =======
  */
 
-// Set up the widget and the main stack.
-// 设置小部件和主Stack（此主Stack表示整个窗口）
-let widget = new ListWidget()
-widget.setPadding(0, 0, 0, 0)
+// Set up the widget with padding.
+// 使用padding来设定widget
+const widget = new ListWidget()
+const horizontalPad = padding < 10 ? 10 - padding : 10
+const verticalPad = padding < 15 ? 15 - padding : 15
+widget.setPadding(horizontalPad, verticalPad, horizontalPad, verticalPad)
+widget.spacing = 0
 
-let mainStack = widget.addStack()
-mainStack.layoutHorizontally()
-mainStack.setPadding(0, 0, 0, 0) //此为整个小部件的窗口的内边距，如非必要请不要更改，否则你想放的内容会显示不全
+// Set up the global variables.
+// 设置全局变量
+var currentRow = {}
+var currentColumn = {}
 
-// Set up alignment.
-// 设置对齐方式
-var currentAlignment = left
+// Set up the initial alignment.
+// 设置初始对齐方式
+var currentAlignment = alignLeft
 
-// Set up our columns.
-for (var x = 0; x < columns.length; x++) {
-
-  let column = columns[x]
-  let columnStack = mainStack.addStack()
-  columnStack.layoutVertically()
-  
-  // Only add padding on the first or last column.
-  columnStack.setPadding(0, x == 0 ? padding/2 : 0, 0, x == columns.length-1 ? padding/2 : 0)
-  columnStack.size = new Size(column.width,0)
-  
-  // Add the items to the column.
-  for (var i = 0; i < column.items.length; i++) {
-    await column.items[i](columnStack)
-  }
-}
-
+// Set up our items.
+// 设置items
+for (item of items) { await item(currentColumn) }
 /*
  * BACKGROUND DISPLAY/背景显示
  * =========================
@@ -354,6 +350,48 @@ Script.complete()
  * =============================================
  */
 
+// Makes a new row on the widget.
+// 在窗口小部件上创建新行
+function row(input = null) {
+
+  function makeRow() {
+    currentRow = widget.addStack()
+    currentRow.layoutHorizontally()
+    currentRow.setPadding(0, 0, 0, 0)
+    currentColumn.spacing = 0
+    
+    // If input was given, make a column of that size.
+    // 如果输入了参数则使用参数的尺寸大小来创建
+    if (input > 0) { currentRow.size = new Size(0,input) }
+  }
+  
+  // If there's no input or it's a number, it's being called in the layout declaration.
+  if (!input || typeof input == "number") { return makeRow }
+  
+  // Otherwise, it's being called in the generator.
+  else { makeRow() }
+}
+
+// Makes a new column on the widget.
+function column(input = null) {
+ 
+  function makeColumn() {
+    currentColumn = currentRow.addStack()
+    currentColumn.layoutVertically()
+    currentColumn.setPadding(0, 0, 0, 0)
+    currentColumn.spacing = 0
+    
+    // If input was given, make a column of that size.
+    if (input > 0) { currentColumn.size = new Size(input,0) }
+  }
+  
+  // If there's no input or it's a number, it's being called in the layout declaration.
+  if (!input || typeof input == "number") { return makeColumn }
+  
+  // Otherwise, it's being called in the generator.
+  else { makeColumn() }
+}
+
 // Create an aligned stack to add content to.
 // 创建对齐的Stack以向其添加内容
 function align(column) {
@@ -407,7 +445,7 @@ function space(input = null) {
     // 如果输入为null或零时，添加一个间距
     if (!input || input == 0) { column.addSpacer() }
     
-    // Otherwise, add a space with the specified length
+    // Otherwise, add a space with the specified length.
     // 否则，添加具有指定长度的间距
     else { column.addSpacer(input) }
   }
@@ -436,7 +474,7 @@ function center(x) { currentAlignment = alignCenter }
 /*
  * SETUP FUNCTIONS
  * 设定函数
- * These functions prepare data needed for items
+ * These functions prepare data needed for items.
  * 以下这些函数是小部件所需的数据
  * ==============================================
  */
@@ -738,7 +776,7 @@ async function date(column) {
   // 如果是有硬编码文本或有事件显示，则显示为小日期样式
   if (dateSettings.staticDateSize == "small" || (dateSettings.dynamicDateSize && eventData.eventsAreVisible)) {
     let dateStack = align(column)
-    dateStack.setPadding(padding*2, padding, padding, padding) //日期的间距设置，当你在日期设置中选择了显示“small”日期时，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+    dateStack.setPadding(padding, padding, padding, padding)
 
     df.dateFormat = dateSettings.smallDateFormat
     let dateText = provideText(df.string(currentDate), dateStack, textFormat.smallDate)
@@ -749,12 +787,12 @@ async function date(column) {
     let dateOneStack = align(column)
     df.dateFormat = dateSettings.largeDateLineOne
     let dateOne = provideText(df.string(currentDate), dateOneStack, textFormat.largeDate1)
-    dateOneStack.setPadding(padding, padding, 0, padding) //日期的间距设置，当你在日期设置中选择了显示“large”日期时，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+    dateOneStack.setPadding(padding/2, padding, 0, padding)
     
     let dateTwoStack = align(column)
     df.dateFormat = dateSettings.largeDateLineTwo
     let dateTwo = provideText(df.string(currentDate), dateTwoStack, textFormat.largeDate2)
-    dateTwoStack.setPadding(0, padding, padding, padding) //日期的间距设置，当你在日期设置中选择了显示“large”日期时，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+    dateTwoStack.setPadding(0, padding, padding, padding*2) //日期的间距设置，当你在日期设置中选择了显示“large”日期时，调整这项以更改边距，依次是逆时针顺序上、左、下、右
   }
 }
 
@@ -774,7 +812,7 @@ async function greeting(column) {
     return localizedText.nightGreeting
   }
   
-  // Set up the greeting stack
+  // Set up the greeting.
   // 设置问候语Stack和边距
   let greetingStack = align(column)
   let greeting = provideText(makeGreeting(), greetingStack, textFormat.greeting)
@@ -849,7 +887,7 @@ async function events(column) {
       // 事件标题的格式
       const eventLabelStack = align(currentStack)
       const eventLabel = provideText(event.title, eventLabelStack, textFormat.eventLabel)
-      eventLabelStack.setPadding(i==0 ? padding : padding/2, padding, padding/2, padding)
+      eventLabelStack.setPadding(padding, padding, padding, padding)
       continue
     }
     
@@ -866,7 +904,7 @@ async function events(column) {
     }
 
     const title = provideText(event.title.trim(), titleStack, textFormat.eventTitle)
-    titleStack.setPadding(i==0 ? padding : padding/2, padding, event.isAllDay ? padding/2 : padding/10, padding)
+    titleStack.setPadding(padding, padding, event.isAllDay ? padding : padding/5, padding)
     
     // If we're showing a color on the right, show it.
     if (showCalendarColor.length && showCalendarColor.includes("right")) {
@@ -905,7 +943,7 @@ async function events(column) {
 
     const timeStack = align(currentStack)
     const time = provideText(timeText, timeStack, textFormat.eventTime)
-    timeStack.setPadding(0, padding, i==futureEvents.length-1 ? padding : padding/2, padding)
+    timeStack.setPadding(0, padding, padding, padding)
   }
 }
 
@@ -929,7 +967,7 @@ async function current(column) {
   if (weatherSettings.showLocation) {
     let locationTextStack = align(currentWeatherStack)
     let locationText = provideText(locationData.locality, locationTextStack, textFormat.smallTemp)
-    locationTextStack.setPadding(padding, padding, padding/2, padding) //位置名称的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右（这个默认关闭，可到天气设置处启用）
+    locationTextStack.setPadding(padding, padding, padding, padding) //位置名称的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右（这个默认关闭，可到天气设置处启用）
   }
 
   // Show the current condition symbol.
@@ -944,7 +982,7 @@ async function current(column) {
   if (weatherSettings.showCondition) {
     let conditionTextStack = align(currentWeatherStack)
     let conditionText = provideText(weatherData.currentDescription, conditionTextStack, textFormat.smallTemp)
-    conditionTextStack.setPadding(padding, padding, padding, padding) //天气描述的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+    conditionTextStack.setPadding(padding, padding, 0, padding) //天气描述的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
   }
 
   // Show the current temperature.
@@ -961,7 +999,7 @@ async function current(column) {
   // 显示温度条和高/低值
   let tempBarStack = align(currentWeatherStack)
   tempBarStack.layoutVertically()
-  tempBarStack.setPadding(0, padding, padding/2, padding) //高/低温度的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+  tempBarStack.setPadding(0, padding, padding, padding) //高/低温度的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
   
   let tempBar = drawTempBar()
   let tempBarImage = tempBarStack.addImage(tempBar)
@@ -978,7 +1016,7 @@ async function current(column) {
   const mainHighText = Math.round(weatherData.todayHigh).toString()
   const mainHigh = provideText(mainHighText, highLowStack, textFormat.tinyTemp)
   
-  tempBarStack.size = new Size(70,30)
+  tempBarStack.size = new Size(60,30)
 }
 
 // Display upcoming weather.
@@ -993,7 +1031,7 @@ async function future(column) {
   // 设置未来天气的Stack
   let futureWeatherStack = column.addStack()
   futureWeatherStack.layoutVertically()
-  futureWeatherStack.setPadding(padding, padding, padding, padding) //未来天气的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+  futureWeatherStack.setPadding(0, 0, 0, 0)
   futureWeatherStack.url = "https://weather.com/weather/tenday/l/" + locationData.latitude + "," + locationData.longitude
 
   // Determine if we should show the next hour.
@@ -1005,7 +1043,7 @@ async function future(column) {
   const subLabelStack = align(futureWeatherStack)
   const subLabelText = showNextHour ? localizedText.nextHourLabel : localizedText.tomorrowLabel
   const subLabel = provideText(subLabelText, subLabelStack, textFormat.smallTemp)
-  subLabelStack.setPadding(0, padding, padding/4, padding)
+  subLabelStack.setPadding(0, padding, padding/2, padding)
   
   // Set up the sub condition stack.
   // 设置子条件的Stack
@@ -1095,6 +1133,7 @@ async function battery(column) {
   let batteryIcon = batteryStack.addImage(provideBatteryIcon())
   batteryIcon.imageSize = new Size(30,30)
 
+
   // Change the battery icon to red if battery level is <= 20 to match system behavior
   // 如果电池电量小于等于20，则将电池图标更改为红色，以匹配系统行为
   if ( Math.round(batteryLevel * 100) > 20 || Device.isCharging() ) {
@@ -1107,13 +1146,13 @@ async function battery(column) {
 
   }
 
-  batteryStack.addSpacer(padding * 0.8)
+  batteryStack.addSpacer(padding * 0.6)
 
   // Display the battery status
   // 显示电池状态
   let batteryInfo = provideText(getBatteryLevel(), batteryStack, textFormat.battery)
 
-  batteryStack.setPadding(padding, padding, padding, padding) //电池电量的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+  batteryStack.setPadding(padding/2, padding, padding/2, padding) //电池电量的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
 
 }
 
@@ -1139,17 +1178,19 @@ async function sunrise(column) {
   // Set up the stack.
   // 设置Stack
   const sunriseStack = align(column)
-  sunriseStack.setPadding(padding, padding, padding, padding) //日落日出的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+  sunriseStack.setPadding(padding/2, padding, padding/2, padding) //日落日出的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
   sunriseStack.layoutHorizontally()
   sunriseStack.centerAlignContent()
-  
+
+  sunriseStack.addSpacer(padding * 0.3)
+
   // Add the correct symbol.
   // 添加正确的符号
   const symbolName = showSunrise ? "sunrise.fill" : "sunset.fill"
   const symbol = sunriseStack.addImage(SFSymbol.named(symbolName).image)
   symbol.imageSize = new Size(22,22)
   
-  sunriseStack.addSpacer(padding * 0.8)
+  sunriseStack.addSpacer(padding)
   
   // Add the time.
   // 添加时间
@@ -1215,7 +1256,7 @@ function provideTextSymbol(shape) {
 
 // Provide a battery SFSymbol with accurate level drawn on top of it.
 function provideBatteryIcon() {
-
+  
   // If we're charging, show the charging icon.
   if (Device.isCharging()) { return SFSymbol.named("battery.100.bolt").image }
   
@@ -1347,7 +1388,7 @@ function drawVerticalLine(color, height) {
   
   let barPath = new Path()
   const barHeight = height
-  barPath.addRoundedRect(new Rect(0, 0, height, height), width/2, width/2)
+  barPath.addRoundedRect(new Rect(0, 0, width, height), width/2, width/2)
   draw.addPath(barPath)
   draw.setFillColor(color)
   draw.fillPath()
