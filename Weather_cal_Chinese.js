@@ -7,7 +7,7 @@
 
 // To use weather, get a free API key at openweathermap.org/appid and paste it in between the quotation marks.
 // 要使用天气，请在http://openweathermap.org/appid 中获取免费的API密钥并将其粘贴在引号之间。
-const apiKey = ""
+const apiKey = "89065f71db2277c83d22a779a34f16a7"
 
 // Set the locale code. Leave blank "" to match the device's locale. You can change the hard-coded text strings in the TEXT section below.
 // 设置语言环境代码。“”内保留空白以匹配设备的语言环境。您可以在下面的“文本”部分中更改硬编码的文本字符串。
@@ -385,6 +385,7 @@ function alignLeft(alignmentStack) {
   alignmentStack.addSpacer()
   return returnStack
 }
+
 // Create a center-aligned stack.
 // 创建一个居中对齐的Stack
 function alignCenter(alignmentStack) {
@@ -1063,7 +1064,7 @@ function text(input = null) {
     // Otherwise, add the text.
     // 否则添加该文本
     const textStack = align(column)
-    textStack.setPadding(padding*5, padding, padding, padding) //自定义文本的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
+    textStack.setPadding(padding, padding, padding, padding) //自定义文本的间距设置，调整这项以更改边距，依次是逆时针顺序上、左、下、右
     const textDisplay = provideText(input, textStack, textFormat.customText)
   }
   return displayText
@@ -1217,7 +1218,7 @@ function provideBatteryIcon() {
 
   // If we're charging, show the charging icon.
   if (Device.isCharging()) { return SFSymbol.named("battery.100.bolt").image }
-
+  
   // Set the size of the battery icon.
   const batteryWidth = 87
   const batteryHeight = 41
