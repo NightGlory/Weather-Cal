@@ -71,7 +71,7 @@ row,
 
 ## FAQ
 
-__使用须知:__无论是Github链接还是js文本，都必须导入到app（scriptable）中，Gituhub可以直接找到js文件格式后进行复制粘贴。
+__使用须知:__ 无论是Github链接还是js文本，都必须导入到app（scriptable）中，Gituhub可以直接找到js文件格式后进行复制粘贴。
 
 * __使用前必要条件:__ 请确认是否给Scriptable获取定位信息的权限，如果之前有禁止的，请在 _系统-设置-隐私-定位服务-Scriptable_ 重新授权。
 
