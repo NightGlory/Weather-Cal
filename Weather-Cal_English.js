@@ -22,8 +22,8 @@ const imageBackground = true
 // Set to true to reset the widget's background image.
 const forceImageUpdate = false
 
-// Set the padding around each item. Default is 10.
-const padding = 10
+// Set the padding around each item. Default is 5.
+const padding = 5
 
 /*
  * LAYOUT
@@ -31,37 +31,35 @@ const padding = 10
  * ========================================
  */
 
-// Set the width of the column, or set to 0 for an automatic width.
+// You always need to start with "row," and "column," items, but you can now add as many as you want.
+// Adding left, right, or center will align everything after that. The default alignment is left.
 
-// You can add items to the column: 
-// date, greeting, events, current, future, battery, text("Your text here")
-// You can also add a left, center, or right to the list. Everything after it will be aligned that way.
+// You can add a flexible vertical space with "space," or a fixed-size space like this: "space(50)"
+// Align items to the top or bottom of columns by adding "space," before or after all items in the column.
 
+// There are many possible items, including: date, greeting, events, current, future, battery, sunrise, and text("Your text here")
 // Make sure to always put a comma after each item.
 
-const columns = [{
+const items = [
   
-  // Settings for the left column.
-  width: 0,
-  items: [
-    
-    left,
-    greeting,
+  row,
+  
+    column,
     date,
-    events,
-    
-]}, {
-
-  // Settings for the right column.
-  width: 100,
-  items: [
-    
-    left,
-    current,
+    battery,
+    sunrise,
     space,
+    
+    column(90),
+    current,
     future,
+    
+  row,
   
-]}]
+    column,
+    events,
+  
+]
 
 /*
  * ITEM SETTINGS
@@ -74,7 +72,7 @@ const columns = [{
 const dateSettings = {
 
   // If set to true, date will become smaller when events are displayed.
-  dynamicDateSize: true
+  dynamicDateSize: false
 
   // If the date is not dynamic, should it be large or small?
   ,staticDateSize: "large"
@@ -190,8 +188,8 @@ const textFormat = {
   
   customText:  { size: 14, color: "", font: "" },
   
-  battery:     { size: 18, color: "", font: "medium" },
-  sunrise:     { size: 18, color: "", font: "medium" },
+  battery:     { size: 14, color: "", font: "medium" },
+  sunrise:     { size: 14, color: "", font: "medium" },
 }
 
 /*
@@ -211,37 +209,26 @@ const currentDate = new Date()
 const files = FileManager.local()
 
 /*
- * COLUMNS
- * =======
+ * CONSTRUCTION
+ * ============
  */
 
-// Set up the widget and the main stack.
-let widget = new ListWidget()
-widget.setPadding(0, 0, 0, 0)
+// Set up the widget with padding.
+const widget = new ListWidget()
+const horizontalPad = padding < 10 ? 10 - padding : 10
+const verticalPad = padding < 15 ? 15 - padding : 15
+widget.setPadding(horizontalPad, verticalPad, horizontalPad, verticalPad)
+widget.spacing = 0
 
-let mainStack = widget.addStack()
-mainStack.layoutHorizontally()
-mainStack.setPadding(0, 0, 0, 0)
+// Set up the global variables.
+var currentRow = {}
+var currentColumn = {}
 
-// Set up alignment.
-var currentAlignment = left
+// Set up the initial alignment.
+var currentAlignment = alignLeft
 
-// Set up our columns.
-for (var x = 0; x < columns.length; x++) {
-
-  let column = columns[x]
-  let columnStack = mainStack.addStack()
-  columnStack.layoutVertically()
-  
-  // Only add padding on the first or last column.
-  columnStack.setPadding(0, x == 0 ? padding/2 : 0, 0, x == columns.length-1 ? padding/2 : 0)
-  columnStack.size = new Size(column.width,0)
-  
-  // Add the items to the column.
-  for (var i = 0; i < column.items.length; i++) {
-    await column.items[i](columnStack)
-  }
-}
+// Set up our items.
+for (item of items) { await item(currentColumn) }
 
 /*
  * BACKGROUND DISPLAY
@@ -293,6 +280,46 @@ Script.complete()
  * These functions manage spacing and alignment.
  * =============================================
  */
+
+// Makes a new row on the widget.
+function row(input = null) {
+
+  function makeRow() {
+    currentRow = widget.addStack()
+    currentRow.layoutHorizontally()
+    currentRow.setPadding(0, 0, 0, 0)
+    currentColumn.spacing = 0
+    
+    // If input was given, make a column of that size.
+    if (input > 0) { currentRow.size = new Size(0,input) }
+  }
+  
+  // If there's no input or it's a number, it's being called in the layout declaration.
+  if (!input || typeof input == "number") { return makeRow }
+  
+  // Otherwise, it's being called in the generator.
+  else { makeRow() }
+}
+
+// Makes a new column on the widget.
+function column(input = null) {
+ 
+  function makeColumn() {
+    currentColumn = currentRow.addStack()
+    currentColumn.layoutVertically()
+    currentColumn.setPadding(0, 0, 0, 0)
+    currentColumn.spacing = 0
+    
+    // If input was given, make a column of that size.
+    if (input > 0) { currentColumn.size = new Size(input,0) }
+  }
+  
+  // If there's no input or it's a number, it's being called in the layout declaration.
+  if (!input || typeof input == "number") { return makeColumn }
+  
+  // Otherwise, it's being called in the generator.
+  else { makeColumn() }
+}
 
 // Create an aligned stack to add content to.
 function align(column) {
@@ -635,12 +662,12 @@ async function date(column) {
     let dateOneStack = align(column)
     df.dateFormat = dateSettings.largeDateLineOne
     let dateOne = provideText(df.string(currentDate), dateOneStack, textFormat.largeDate1)
-    dateOneStack.setPadding(padding, padding, 0, padding)
+    dateOneStack.setPadding(padding/2, padding, 0, padding)
     
     let dateTwoStack = align(column)
     df.dateFormat = dateSettings.largeDateLineTwo
     let dateTwo = provideText(df.string(currentDate), dateTwoStack, textFormat.largeDate2)
-    dateTwoStack.setPadding(0, padding, padding, 10)
+    dateTwoStack.setPadding(0, padding, padding, padding)
   }
 }
 
@@ -722,7 +749,7 @@ async function events(column) {
       // Mimic the formatting of an event title, mostly.
       const eventLabelStack = align(currentStack)
       const eventLabel = provideText(event.title, eventLabelStack, textFormat.eventLabel)
-      eventLabelStack.setPadding(i==0 ? padding : padding/2, padding, padding/2, padding)
+      eventLabelStack.setPadding(padding, padding, padding, padding)
       continue
     }
     
@@ -739,7 +766,7 @@ async function events(column) {
     }
 
     const title = provideText(event.title.trim(), titleStack, textFormat.eventTitle)
-    titleStack.setPadding(i==0 ? padding : padding/2, padding, event.isAllDay ? padding/2 : padding/10, padding)
+    titleStack.setPadding(padding, padding, event.isAllDay ? padding : padding/5, padding)
     
     // If we're showing a color on the right, show it.
     if (showCalendarColor.length && showCalendarColor.includes("right")) {
@@ -774,7 +801,7 @@ async function events(column) {
 
     const timeStack = align(currentStack)
     const time = provideText(timeText, timeStack, textFormat.eventTime)
-    timeStack.setPadding(0, padding, i==futureEvents.length-1 ? padding : padding/2, padding)
+    timeStack.setPadding(0, padding, padding, padding)
   }
 }
 
@@ -795,7 +822,7 @@ async function current(column) {
   if (weatherSettings.showLocation) {
     let locationTextStack = align(currentWeatherStack)
     let locationText = provideText(locationData.locality, locationTextStack, textFormat.smallTemp)
-    locationTextStack.setPadding(padding, padding, padding/2, padding)
+    locationTextStack.setPadding(padding, padding, padding, padding)
   }
 
   // Show the current condition symbol.
@@ -808,7 +835,7 @@ async function current(column) {
   if (weatherSettings.showCondition) {
     let conditionTextStack = align(currentWeatherStack)
     let conditionText = provideText(weatherData.currentDescription, conditionTextStack, textFormat.smallTemp)
-    conditionTextStack.setPadding(padding/2, padding, 0, padding)
+    conditionTextStack.setPadding(padding, padding, 0, padding)
   }
 
   // Show the current temperature.
@@ -823,7 +850,7 @@ async function current(column) {
   // Show the temp bar and high/low values.
   let tempBarStack = align(currentWeatherStack)
   tempBarStack.layoutVertically()
-  tempBarStack.setPadding(0, padding, padding/2, padding)
+  tempBarStack.setPadding(0, padding, padding, padding)
   
   let tempBar = drawTempBar()
   let tempBarImage = tempBarStack.addImage(tempBar)
@@ -840,7 +867,7 @@ async function current(column) {
   const mainHighText = Math.round(weatherData.todayHigh).toString()
   const mainHigh = provideText(mainHighText, highLowStack, textFormat.tinyTemp)
   
-  tempBarStack.size = new Size(70,30)
+  tempBarStack.size = new Size(60,30)
 }
 
 // Display upcoming weather.
@@ -863,7 +890,7 @@ async function future(column) {
   const subLabelStack = align(futureWeatherStack)
   const subLabelText = showNextHour ? localizedText.nextHourLabel : localizedText.tomorrowLabel
   const subLabel = provideText(subLabelText, subLabelStack, textFormat.smallTemp)
-  subLabelStack.setPadding(0, padding, padding/4, padding)
+  subLabelStack.setPadding(0, padding, padding/2, padding)
   
   // Set up the sub condition stack.
   let subConditionStack = align(futureWeatherStack)
@@ -933,7 +960,7 @@ async function battery(column) {
 
     return batteryPercentage
   }
-
+  
   const batteryLevel = Device.batteryLevel()
   
   // Set up the battery level item
@@ -944,11 +971,10 @@ async function battery(column) {
   let batteryIcon = batteryStack.addImage(provideBatteryIcon())
   batteryIcon.imageSize = new Size(30,30)
   
-
   // Change the battery icon to red if battery level is <= 20 to match system behavior
   if ( Math.round(batteryLevel * 100) > 20 || Device.isCharging() ) {
 
-    batteryIcon.tintColor = Color.white()
+    batteryIcon.tintColor = new Color(textFormat.battery.color || textFormat.defaultText.color)
 
   } else {
 
@@ -956,12 +982,12 @@ async function battery(column) {
 
   }
 
-  batteryStack.addSpacer(padding * 0.8)
+  batteryStack.addSpacer(padding * 0.6)
 
   // Display the battery status
   let batteryInfo = provideText(getBatteryLevel(), batteryStack, textFormat.battery)
 
-  batteryStack.setPadding(padding, padding, padding, padding)
+  batteryStack.setPadding(padding/2, padding, padding/2, padding)
 
 }
 
@@ -985,16 +1011,18 @@ async function sunrise(column) {
   
   // Set up the stack.
   const sunriseStack = align(column)
-  sunriseStack.setPadding(padding, padding, padding, padding)
+  sunriseStack.setPadding(padding/2, padding, padding/2, padding)
   sunriseStack.layoutHorizontally()
   sunriseStack.centerAlignContent()
+  
+  sunriseStack.addSpacer(padding * 0.3)
   
   // Add the correct symbol.
   const symbolName = showSunrise ? "sunrise.fill" : "sunset.fill"
   const symbol = sunriseStack.addImage(SFSymbol.named(symbolName).image)
   symbol.imageSize = new Size(22,22)
   
-  sunriseStack.addSpacer(padding * 0.8)
+  sunriseStack.addSpacer(padding)
   
   // Add the time.
   const timeText = formatTime(showSunrise ? new Date(sunrise) : new Date(sunset))
@@ -1054,43 +1082,49 @@ function provideTextSymbol(shape) {
   return "\u2759" 
 }
 
-// Provide the SF Symbols battery icon depending on the battery level.
+// Provide a battery SFSymbol with accurate level drawn on top of it.
 function provideBatteryIcon() {
   
-  // Charging symbol
-  if ( Device.isCharging() ) {
-
-    let batIcon = SFSymbol.named("battery.100.bolt")
-    batIcon.applyLightWeight()
-
-    return batIcon.image
-  }
+  // If we're charging, show the charging icon.
+  if (Device.isCharging()) { return SFSymbol.named("battery.100.bolt").image }
   
-  const batteryLevel = Device.batteryLevel()
+  // Set the size of the battery icon.
+  const batteryWidth = 87
+  const batteryHeight = 41
   
-  // Battery mostly full
-  if ( Math.round(batteryLevel * 100) > 65 ) {
-
-    let batIcon = SFSymbol.named("battery.100")
-    batIcon.applyLightWeight()
-
-    return batIcon.image
-  }
+  // Start our draw context.
+  let draw = new DrawContext()
+  draw.opaque = false
+  draw.respectScreenScale = true
+  draw.size = new Size(batteryWidth, batteryHeight)
   
-  // Battery getting low
-  if ( Math.round(batteryLevel * 100) > 30 ) {
-
-    let batIcon = SFSymbol.named("battery.25")
-    batIcon.applyLightWeight()
-
-    return batIcon.image
-  }
+  // Draw the battery.
+  draw.drawImageInRect(SFSymbol.named("battery.0").image, new Rect(0, 0, batteryWidth, batteryHeight))
   
-  // Low battery
-  let batIcon = SFSymbol.named("battery.0")
-  batIcon.applySemiboldWeight()
+  // Match the battery level values to the SFSymbol.
+  const x = batteryWidth*0.1525
+  const y = batteryHeight*0.247
+  const width = batteryWidth*0.602
+  const height = batteryHeight*0.505
+  
+  // Prevent unreadable icons.
+  let level = Device.batteryLevel()
+  if (level < 0.05) { level = 0.05 }
+  
+  // Determine the width and radius of the battery level.
+  const current = width * level
+  let radius = height/6.5
+  
+  // When it gets low, adjust the radius to match.
+  if (current < (radius * 2)) { radius = current / 2 }
 
-  return batIcon.image
+  // Make the path for the battery level.
+  let barPath = new Path()
+  barPath.addRoundedRect(new Rect(x, y, current, height), radius, radius)
+  draw.addPath(barPath)
+  draw.setFillColor(Color.black())
+  draw.fillPath()
+  return draw.getImage()
 }
 
 // Provide a symbol based on the condition.
@@ -1182,7 +1216,7 @@ function drawVerticalLine(color, height) {
   
   let barPath = new Path()
   const barHeight = height
-  barPath.addRoundedRect(new Rect(0, 0, height, height), width/2, width/2)
+  barPath.addRoundedRect(new Rect(0, 0, width, height), width/2, width/2)
   draw.addPath(barPath)
   draw.setFillColor(color)
   draw.fillPath()
