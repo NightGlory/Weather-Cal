@@ -188,24 +188,24 @@ async function blurImage(img,imgCrop,style) {
   Or support me on flattr: 
   https://flattr.com/thing/72791/StackBlur-a-fast-almost-Gaussian-Blur-Effect-for-CanvasJavascript
 
-  Copy右边 (c) 2010 Mario Klingemann
+  Copyright (c) 2010 Mario Klingemann
 
   Permission is hereby granted, free of charge, to any person
   obtaining a copy of this software and associated documentation
   files (the "Software"), to deal in the Software without
-  restriction, including without limitation the 右边s to use,
+  restriction, including without limitation the rights to use,
   copy, modify, merge, publish, distribute, sublicense, and/or sell
   copies of the Software, and to permit persons to whom the
   Software is furnished to do so, subject to the following
   conditions:
 
-  The above copy右边 notice and this permission notice shall be
+  The above copyright notice and this permission notice shall be
   included in all copies or substantial portions of the Software.
 
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPY右边
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
   HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
@@ -249,7 +249,7 @@ async function blurImage(img,imgCrop,style) {
       24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24,
       24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24 ];
 
-  function stackBlurCanvasRGB( id, 顶部_x, 顶部_y, width, height, radius )
+  function stackBlurCanvasRGB( id, top_x, top_y, width, height, radius )
   {
     if ( isNaN(radius) || radius < 1 ) return;
     radius |= 0;
@@ -260,15 +260,15 @@ async function blurImage(img,imgCrop,style) {
   
     try {
       try {
-      imageData = context.getImageData( 顶部_x, 顶部_y, width, height );
+      imageData = context.getImageData( top_x, top_y, width, height );
       } catch(e) {
     
       // NOTE: this part is supposedly only needed if you want to work with local files
       // so it might be okay to remove the whole try/catch block and just use
-      // imageData = context.getImageData( 顶部_x, 顶部_y, width, height );
+      // imageData = context.getImageData( top_x, top_y, width, height );
       try {
         netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
-        imageData = context.getImageData( 顶部_x, 顶部_y, width, height );
+        imageData = context.getImageData( top_x, top_y, width, height );
       } catch(e) {
         alert("Cannot access local image");
         throw new Error("unable to access local image data: " + e);
@@ -476,7 +476,7 @@ async function blurImage(img,imgCrop,style) {
       }
     }
   
-    context.putImageData( imageData, 顶部_x, 顶部_y );
+    context.putImageData( imageData, top_x, top_y );
   
   }
 
