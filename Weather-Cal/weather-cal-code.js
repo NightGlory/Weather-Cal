@@ -831,7 +831,7 @@ async function makeWidget(settings, name, iCloudInUse) {
   
     // Determine which reminders to show.
     let reminders = await Reminder.allIncomplete()
-    reminders = reminders.filter(shouldShowReminder)
+    reminders = reminders.filter(shouldShowReminder).slice(0,numberOfReminders)
     
     // Sort in order of due date.
     reminders.sort(function(a, b) {
@@ -1533,7 +1533,7 @@ async function makeWidget(settings, name, iCloudInUse) {
       subRain.tintColor = new Color(textFormat.smallTemp.color || textFormat.defaultText.color)
       subRainStack.addSpacer(5)
 
-      const subRainText = provideText((rainPercent*100) + "%", subRainStack, textFormat.smallTemp)
+      const subRainText = provideText(Math.round(rainPercent*100) + "%", subRainStack, textFormat.smallTemp)
     }
   }
 
