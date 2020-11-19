@@ -20,7 +20,7 @@ It will update to the newest version.
 // Warn the user if this script is added to a widget.
 if (config.runsInWidget) {
   let infoWidget = new ListWidget()
-  infoWidget.addText('The "Weather Cal code" script is not intended to be used as a widget. Please use a Weather Cal widget script instead.')
+  infoWidget.addText('"Weather-cal-code" 不作为小部件使用. 请使用"Weather Cal"脚本设置为小部件')
   Script.setWidget(infoWidget)
   Script.complete()
 }
@@ -38,7 +38,7 @@ module.exports.createWidget = async (settings, name, iCloudInUse) => {
 async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
   
   const fm = iCloudInUse ? FileManager.iCloud() : FileManager.local()
-  const widgetUrl = "https://raw.githubusercontent.com/mzeryck/Weather-Cal/main/weather-cal.js"
+  const widgetUrl = "https://raw.githubusercontent.com/KerwinKwong/Weather-Cal/main/Weather-Cal/weather-cal.js"
   
   // If no setup file exists, this is the initial Weather Cal setup.
   const setupPath = fm.joinPath(fm.libraryDirectory(), "weather-cal-setup")
@@ -49,21 +49,21 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
   if (fm.fileExists(widgetpath)) { return await editSettings() }
   
   // Otherwise, we're setting up this particular widget.
-  await generateAlert("Weather Cal is set up, but you need to choose a background for this widget.",["Continue"])
+  await generateAlert("Weather Cal已设置,但是您需要为此小部件选择背景。",["Continue"])
   return await setWidgetBackground() 
 
   // Run the initial setup.
   async function initialSetup() {
   
     // Welcome the user and make sure they like the script name.
-    let message = "Welcome to Weather Cal. Make sure your script has the name you want before you begin."
-    let options = ['I like the name "' + name + '"', "Let me go change it"]
+    let message = "欢迎使用Weather Cal。在开始之前，请确保脚本具有所需的名称。"
+    let options = ['我喜欢"' + name + '"这个名字', "我要更改"]
     let shouldExit = await generateAlert(message,options)
     if (shouldExit) return
   
     // Welcome the user and check for permissions.
-    message = "Next, we need to check if you've given permissions to the Scriptable app. This might take a few seconds."
-    options = ["Check permissions"]
+    message = "接下来，需要检查您是否已授予Scriptable应用程序权限。 这可能需要几秒钟。"
+    options = ["检查权限"]
     await generateAlert(message,options)
   
     let errors = []
@@ -77,24 +77,24 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
     if (errors.length == 3) { issues += ", " + errors[1] + ", and " + errors[2] }
   
     if (issues) { 
-      message = "Scriptable does not have permission for " + issues + ". Some features may not work without enabling them in the Settings app."
-      options = ["Continue setup anyway", "Exit setup"]
+      message = "Scriptable没有权限" + issues + "。 如果未在“设置”中启用某些功能，则可能无法使用。"
+      options = ["仍然继续设置", "退出设置"]
     } else {
-      message = "Your permissions are enabled."
-      options = ["Continue setup"]
+      message = "您的权限已启用。"
+      options = ["继续设置"]
     }
     shouldExit = await generateAlert(message,options)
     if (shouldExit) return
   
     // Set up the weather integration.
-    message = "To display the weather on your widget, you need an OpenWeather API key."
-    options = ["I already have a key", "I need to get a key", "I don't want to show weather info"]
+    message = "要在小部件上显示天气，您需要一个OpenWeather API密钥。"
+    options = ["我已有一个密钥", "我需要一个密钥", "我不想显示天气信息"]
     const weather = await generateAlert(message,options)
   
     // Show a web view to claim the API key.
     if (weather == 1) {
-      message = "On the next screen, sign up for OpenWeather. Find the API key, copy it, and close the web view. You will then be prompted to paste in the key."
-      options = ["Continue"]
+      message = "在下一个窗口中，注册OpenWeather。 找到API密钥，将其复制，然后关闭Web视图。 然后将提示您粘贴密钥。"
+      options = ["继续"]
       let weather = await generateAlert(message,options)
   
       let webView = new WebView()
@@ -114,8 +114,8 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
     // Record setup completion.
     writePreference("weather-cal-setup", "true")
     
-    message = "Your widget is ready! You'll now see a preview. You can adjust more settings in the script itself. When you're ready, add a Scriptable widget to the home screen and select this script."
-    options = ["Show preview"]
+    message = "您的小部件已准备就绪！ 现在，您可以查看预览。 您可以在脚本代码中调整更多设置。 准备好后，将Scriptable小部件添加到主屏幕，然后选择此Weather-cal脚本。"
+    options = ["显示预览"]
     await generateAlert(message,options)
   
     // Return and show the preview.
@@ -125,8 +125,8 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
 
   // Edit the widget settings.
   async function editSettings() {
-    let message = "Edit your widget settings."
-    let options = ["Show widget preview", "Change background", "Re-enter API key", "Update code", "Reset widget", "Exit settings menu"]
+    let message = "编辑您的小部件设置。"
+    let options = ["显示预览", "更改背景", "重置API", "更新代码", "重置widget", "退出设置"]
     const response = await generateAlert(message,options)
   
     // Return true to show the widget preview.
@@ -146,8 +146,8 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
     
     if (response == 3) {
       // Prompt the user for updates.
-      message = "Would you like to update the Weather Cal code? Your widgets will not be affected."
-      options = ["Update", "Exit"]
+      message = "您想更新Weather Cal代码吗？ 您的小部件将不受影响。"
+      options = ["更新", "退出"]
       const updateResponse = await generateAlert(message,options)
   
       // Exit if the user didn't want to update.
@@ -155,7 +155,7 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
       
       // Try updating the code.
       const success = await downloadCode(codeFilename, gitHubUrl)
-      message = success ? "The update is now complete." : "The update failed. Please try again later."
+      message = success ? "代码更新已完成。" : "更新失败，请稍后再试。"
       options = ["OK"]
 
       await generateAlert(message,options)
@@ -164,14 +164,14 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
   
     if (response == 4) {
       const alert = new Alert()
-      alert.message = "Are you sure you want to completely reset this widget?"
-      alert.addDestructiveAction("Reset")
-      alert.addAction("Cancel")
+      alert.message = "您确定要完全重置此小部件吗？"
+      alert.addDestructiveAction("重置")
+      alert.addAction("取消")
     
       const cancelReset = await alert.present()
       if (cancelReset === 0) {
         const success = await downloadCode(name, widgetUrl)
-        message = success ? "This script has been reset. Close the script and reopen it for the change to take effect." : "The reset failed."
+        message = success ? "脚本已被重置。 关闭脚本，然后重新打开以使更改生效。" : "重置失败"
         options = ["OK"]
         await generateAlert(message,options)
       }
@@ -186,12 +186,12 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
   async function getWeatherKey(firstRun = false) {
  
     // Prompt for the key.
-    const apiKey = await promptForText("Paste your API key in the box below.", "82c29fdbgd6aebbb595d402f8a65fabf")
+    const apiKey = await promptForText("在下面的输入框中粘贴您的API密钥。", "82c29fdbgd6aebbb595d402f8a65fabf")
   
     let message, options
     if (!apiKey || apiKey == "" || apiKey == null) {
-      message = "No API key was entered. Try copying the key again and re-running this script."
-      options = ["Exit"]
+      message = "没有输入API密钥。 尝试再次复制密钥，然后重新运行此脚本。"
+      options = ["退出"]
       await generateAlert(message,options)
       return false
     }
@@ -207,13 +207,13 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
     
     // Warn the user if it didn't work.
     if (!val.current) {
-      message = firstRun ? "New OpenWeather API keys may take a few hours to activate. Your widget will start displaying weather information once it's active." : "The key you entered, " + apiKey + ", didn't work. If it's a new key, it may take a few hours to activate."
-      options = [firstRun ? "Continue" : "OK"]
+      message = firstRun ? "新的OpenWeather API密钥可能需要几个小时才能激活。 您的小部件一旦启用，将开始显示天气信息。" : "您输入的密钥，" + apiKey + ", 没用。 如果是新密钥，则可能需要几个小时才能激活。"
+      options = [firstRun ? "继续" : "OK"]
       await generateAlert(message,options)
       
     // Otherwise, confirm that it was saved.
     } else if (val.current && !firstRun) {
-      message = "The new key worked and was saved."
+      message = "新密钥可用并被保存。"
       options = ["OK"]
       await generateAlert(message,options)
     }
@@ -226,22 +226,22 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
   async function setWidgetBackground() {
 
     // Prompt for the widget background.
-    let message = "What type of background would you like for your widget?"
-    let options = ["Solid color", "Automatic gradient", "Custom gradient", "Image from Photos"]
+    let message = "您希望小部件使用哪种背景？"
+    let options = ["纯色背景", "自动渐变", "自定义渐变", "选择图片"]
     let backgroundType = await generateAlert(message,options)
   
     let background = {}
     if (backgroundType == 0) {
       background.type = "color"
-      background.color = await promptForText("Enter the hex value of the background color you want.","#007030")
+      background.color = await promptForText("输入所需背景颜色的十六进制值。","#007030")
     
     } else if (backgroundType == 1) {
       background.type = "auto"
       
     } else if (backgroundType == 2) {
       background.type = "gradient"
-      background.initialColor = await promptForText("Enter the hex value of the first gradient color.","#007030")
-      background.finalColor = await promptForText("Enter the hex value of the second gradient color.","#007030")
+      background.initialColor = await promptForText("输入第一个渐变颜色的十六进制值。","#007030")
+      background.finalColor = await promptForText("输入第二个渐变颜色的十六进制值。","#007030")
     
     } else if (backgroundType == 3) {
       background.type = "image"
@@ -263,7 +263,7 @@ async function setup(name, iCloudInUse, codeFilename, gitHubUrl) {
       
       // If we just created a dupe, alert the user.
       if (!dupeAlreadyExists && fm.fileExists(dupePath)) {
-        message = "Weather Cal detected a duplicate image. Please open the Files app, navigate to Scriptable > Weather Cal, and make sure the file named " + name + ".jpg is correct."
+        message = "Weather Cal检测到重复的图像。 请打开“文件”应用，“Scriptable”>“Weather-cal”，并确保文件名为" + name + ".jpg 是正确的。"
         options = ["OK"]
         const response = generateAlert(message,options)
       }
